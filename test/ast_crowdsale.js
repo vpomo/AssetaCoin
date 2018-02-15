@@ -33,20 +33,23 @@ contract('ASTCrowdsale', (accounts) => {
     });
 
     it('verification owner burn token', async ()  => {
-        var amountTokens = 20 * 10**22;
-        await contract.transfer(accounts[4], amountTokens, {from:owner});
-        var balanceOwner = await contract.balanceOf(owner);
-        console.log("balanceOwner = " + balanceOwner);
-        //assert.equal(balanceOwner < totalSupply);
-        await contract.ownerBurnToken(10, {from:owner});
-        var totalSupplyAfter = await contract.totalSupply.call();
-        console.log("totalSupplyAfter = " + totalSupplyAfter)
+        var burnTokens = 20 * 10**22;
+        var totalSupplyBefore = await contract.totalSupply.call();
+        //console.log("totalSupplyBefore = " + totalSupplyBefore)
+        var balanceOwnerBeforeBurn = await contract.balanceOf(owner);
+        //console.log("balanceOwnerBeforeBurn = " + balanceOwnerBeforeBurn);
+        await contract.ownerBurnToken(burnTokens, {from:owner});
+        var balanceOwnerAfterBurn = await contract.balanceOf(owner);
+        //console.log("balanceOwnerAfterBurn = " + balanceOwnerAfterBurn);
 
-        //console.log("balanceOwner = " + balanceOwner);
-        //assert.equal(totalSupply, balanceOwner);
+        var totalSupplyAfterBurn = await contract.totalSupply.call();
+        //console.log("totalSupplyAfterBurn = " + totalSupplyAfterBurn)
+        assert.equal(totalSupplyBefore, Number(totalSupplyAfterBurn) + Number(burnTokens));
+        assert.equal(balanceOwnerBeforeBurn, Number(balanceOwnerAfterBurn) + Number(burnTokens));
+
     });
 
-it('verification of receiving Ether', async ()  => {
+    it('verification of receiving Ether', async ()  => {
         var tokenAllocatedBefore = await contract.tokenAllocated.call();
         var balanceAccountTwoBefore = await contract.balanceOf(accounts[2]);
         var weiRaisedBefore = await contract.weiRaised.call();

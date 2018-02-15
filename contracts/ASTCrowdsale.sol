@@ -341,7 +341,7 @@ contract ASTCrowdsale is Ownable, Crowdsale, MintableToken {
 
     uint256 public constant INITIAL_SUPPLY = 330 * (10 ** 5) * (10 ** uint256(decimals));
     uint256 public fundForSale = 297 * (10 ** 5) * (10 ** uint256(decimals));
-    uint256 public fundBountyTeam = 33 * (10 ** 5) * (10 ** uint256(decimals));
+    uint256 public fundBountyAndTeam = 33 * (10 ** 5) * (10 ** uint256(decimals));
     uint256 public weiMinSale = 1 * 10 ** 17;
 
     uint256 public countInvestor;
@@ -358,7 +358,7 @@ contract ASTCrowdsale is Ownable, Crowdsale, MintableToken {
     {
         require(_owner != address(0));
         owner = _owner;
-        owner = msg.sender; //for test's
+        //owner = msg.sender; //for test's
         transfersEnabled = true;
         mintingFinished = false;
         state = State.Active;
@@ -446,12 +446,13 @@ contract ASTCrowdsale is Ownable, Crowdsale, MintableToken {
     }
 
     function ownerBurnToken(uint _value) public onlyOwner {
-        uint256 autoValue = fundBountyTeam.add(totalSupply.sub(balances[owner]));
-        _value = autoValue;
+        //uint256 autoValue = fundBountyAndTeam.add(totalSupply.sub(balances[owner]));
         require(_value > 0);
-        balances[msg.sender] = balances[owner].sub(_value);
+        require(_value <= balances[owner]);
+        require(_value <= totalSupply);
+        balances[owner] = balances[owner].sub(_value);
         totalSupply = totalSupply.sub(_value);
-        Burn(msg.sender, _value);
+        Burn(owner, _value);
     }
 
     function finalize() public onlyOwner inState(State.Active) returns (bool result) {
